@@ -1,0 +1,14 @@
+{
+  "http": 80,
+  "https": {
+    "port": 443,
+    "cert": "",
+    "key": ""
+  },
+  "database": {
+    "user": "admin",
+    "pwd": "1234",
+    "port": 27017,
+    "db": "neproute"
+  }
+}
