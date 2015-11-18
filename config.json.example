@@ -1,13 +1,11 @@
 {
   "http": 80,
-  "https": {
-    "port": 443,
-    "cert": "",
-    "key": ""
-  },
+  "https": 443,
+  "host": "localhost",
   "database": {
     "user": "admin",
     "pwd": "1234",
+    "host": "localhost",
     "port": 27017,
     "db": "neproute"
   }
