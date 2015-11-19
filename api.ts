@@ -44,7 +44,7 @@ api.route('/route/host/:host')
     ;
   });
 
-api.get('/route/id/:id', (req, res) => {
+api.get('/route/:id', (req, res) => {
   let { id } = req.params;
   route.findId(id, (err, d) => {
     if (err) { res.sendStatus(500); return; }
