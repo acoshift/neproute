@@ -6,23 +6,17 @@ import { Config } from "./config";
 
 export var db: Db;
 
-class Database {
-  connect(config: Config, cb: (err: Error) => void): void {
-    this.config = config;
-    let uri = (() => {
-      let { user, pwd, host, port, db } = config.database;
-      return `mongodb://${(user && pwd) ? `${user}:${escape(pwd)}@` : ''}${host || 'localhost'}:${port || 27017}/${db || 'neproute'}`;
-    })();
-    MongoClient.connect(uri, (err, d) => {
-      db = d;
-      cb(null);
-    });
-  }
-
-  config: Config;
+export function connect(config: Config, cb: (err: Error) => void): void {
+  this.config = config;
+  let uri = (() => {
+    let { user, pwd, host, port, db } = config.database;
+    return `mongodb://${(user && pwd) ? `${user}:${escape(pwd)}@` : ''}${host || 'localhost'}:${port || 27017}/${db || 'neproute'}`;
+  })();
+  MongoClient.connect(uri, (err, d) => {
+    db = d;
+    cb(err);
+  });
 }
-
-export var database = new Database();
 
 export interface RouteSchema {
   host: string;

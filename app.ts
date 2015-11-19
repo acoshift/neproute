@@ -7,7 +7,7 @@ import * as express from "express";
 import * as ip from "ip";
 import { ObjectID } from "mongodb";
 import { Config } from "./config";
-import { database, db } from "./db";
+import { connect, db } from "./db";
 import * as api from "./api";
 
 var config: Config = require('./config');
@@ -48,7 +48,7 @@ app.use((req, res, next) => {
   });
 });
 
-database.connect(config, (err) => {
+connect(config, (err) => {
   if (err) { console.log(err); return; }
 
   var https_options = {

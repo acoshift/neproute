@@ -4,7 +4,7 @@ import * as express from "express";
 import { Request, Response } from "express";
 import * as bodyParser from "body-parser";
 import { ObjectID } from "mongodb";
-import { db, database, route, dataRoute, token, RouteSchema, DataInsertSchema } from "./db";
+import { db, route, dataRoute, token, RouteSchema, DataInsertSchema } from "./db";
 
 // TODO: check user permission for each operator
 
