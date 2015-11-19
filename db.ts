@@ -29,7 +29,6 @@ export interface RouteSchema {
   desc: string;
   owner: string;
   routes: RouteRoutesSchema[];
-  meta: RouteMetaSchema;
   createAt: number;
   updateAt: number;
 };
@@ -48,10 +47,6 @@ export interface RouteRoutesSchema {
   route: string;
   data: string; // => DataSchema
 };
-
-export interface RouteMetaSchema {
-  called: number;
-}
 
 class Route {
   findHost(host: string, cb: (err: Error, d: RouteSchema) => void): void {

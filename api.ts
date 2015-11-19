@@ -61,7 +61,6 @@ api.post('/route', (req, res) => {
     desc: b.desc || '',
     owner: b.owner,
     routes: b.routes || [],
-    meta: { called: 0 },
     createAt: Date.now(),
     updateAt: Date.now()
   };
