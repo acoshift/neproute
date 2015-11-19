@@ -18,16 +18,28 @@ export function connect(config: Config, cb: (err: Error) => void): void {
   });
 }
 
-export interface RouteSchema {
+export interface Timestamps {
+  createAt: number,
+  updateAt: number
+}
+
+export interface RouteSchema extends Timestamps {
   host: string;
   ssl: string;
   enabled: boolean;
   desc: string;
   owner: string;
   routes: RouteRoutesSchema[];
-  createAt: number;
-  updateAt: number;
 };
+
+export interface SslSchema extends Timestamps {
+  host: string;
+  ssl: {
+    cert: any,
+    key: any,
+    ca: any
+  }
+}
 
 export interface DataSchema {
   id: string;
