@@ -4,7 +4,7 @@ import * as express from "express";
 import { Request, Response } from "express";
 import * as bodyParser from "body-parser";
 import { ObjectID } from "mongodb";
-import { db, route, dataRoute, token, RouteSchema, DataInsertSchema } from "./db";
+import { db, route, dataRoute, token, RouteSchema, DataInsertSchema, RouteUpdateSchema } from "./db";
 
 // TODO: check user permission for each operator
 
@@ -59,6 +59,27 @@ api.delete('/route/:id', (req, res) => {
   db.collection('route').deleteOne({ _id: ObjectID.createFromHexString(id) }, { w: 1 }, (err, d) => {
     if (err) { res.sendStatus(500); return; }
     res.json(d);
+  });
+});
+
+api.put('/route/:id', (req, res) => {
+  let { id } = req.params;
+  db.collection('route').findOne({ _id: ObjectID.createFromHexString(id) }, (err, d: RouteSchema) => {
+    if (err) { res.sendStatus(500); return; }
+    let b = req.body;
+    let k: RouteUpdateSchema = {
+      host: b.host || d.host,
+      ssl: b.ssl || d.ssl,
+      enabled: b.enabled || d.enabled,
+      desc: b.desc || d.desc,
+      owner: b.owner || d.owner,
+      routes: b.routes || d.routes,
+      updateAt: Date.now()
+    };
+    db.collection('route').updateOne({ _id: ObjectID.createFromHexString(id) }, k, (err, d) => {
+      if (err) { res.sendStatus(500); return; }
+      res.json(d);
+    });
   });
 });
 
