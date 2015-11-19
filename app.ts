@@ -54,11 +54,11 @@ database.connect(config, (err, db) => {
   var https_options = {
     SNICallback: (host, cb) => {
       db.collection('ssl').findOne({ host: host }, (err, d) => {
-        if (err) cb(null, null);
+        if (err || !d) cb(null, null);
         cb(null, tls.createSecureContext({
-            cert: d.ssl.cert,
-            key: d.ssl.key,
-            ca: d.ssl.ca
+            cert: d.ssl.cert || '',
+            key: d.ssl.key || '',
+            ca: d.ssl.ca || ''
           }).context
         );
       });
@@ -69,12 +69,11 @@ database.connect(config, (err, db) => {
   };
 
   db.collection('ssl').findOne({ host: config.host }, (err, d) => {
-    //if (d) {
+    if (d) {
       https_options.cert = d.ssl.cert || '';
       https_options.key = d.ssl.key || '';
       https_options.ca = d.ssl.ca || '';
-    //}
-    console.log(https_options);
+    }
     config.http && http.createServer(app).listen(config.http);
     config.https && https.createServer(https_options, app).listen(config.https);
   });
