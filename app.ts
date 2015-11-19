@@ -7,7 +7,7 @@ import * as express from "express";
 import * as ip from "ip";
 import { ObjectID } from "mongodb";
 import { Config } from "./config";
-import { database } from "./db";
+import { database, db } from "./db";
 import * as api from "./api";
 
 var config: Config = require('./config');
@@ -30,7 +30,7 @@ app.use((req, res, next) => {
   } catch(e) {}
   if (url.length > 1 && url.substring(url.length - 1) == '/')
     url = url.substring(0, url.length - 1);
-  database.db.collection('route').findOne({ host: hostname, 'routes.route' : url }, [ 'host', 'enabled', 'ssl', 'routes.data' ], (err, d) => {
+  db.collection('route').findOne({ host: hostname, 'routes.route' : url }, [ 'host', 'enabled', 'ssl', 'routes.data' ], (err, d) => {
     if (err) { res.sendStatus(500); return; }
     if (!d || !d.enabled) { res.sendStatus(404); return; }
     if (!req.secure && d.ssl == 'prefer') {
@@ -41,14 +41,14 @@ app.use((req, res, next) => {
       res.redirect(`http://${hostname + url}`);
       return;
     }
-    database.db.collection('data').findOne({ _id: ObjectID.createFromHexString(d.routes[0].data) }, (err, d) => {
+    db.collection('data').findOne({ _id: ObjectID.createFromHexString(d.routes[0].data) }, (err, d) => {
       if (err) { res.sendStatus(500); return; }
       res.send(d.data);
     });
   });
 });
 
-database.connect(config, (err, db) => {
+database.connect(config, (err) => {
   if (err) { console.log(err); return; }
 
   var https_options = {

@@ -4,17 +4,21 @@ import { escape } from "querystring";
 import { MongoClient, Db, ObjectID } from "mongodb";
 import { Config } from "./config";
 
+export var db: Db;
+
 class Database {
-  connect(config: Config, callback: (err: Error, db: Db) => void): void {
+  connect(config: Config, cb: (err: Error) => void): void {
     this.config = config;
-    let { user, pwd, host, port, db } = config.database;
-    let uri = `mongodb://${(user && pwd) ? `${user}:${escape(pwd)}@` : ''}${host || 'localhost'}:${port || 27017}/${db || 'neproute'}`;
+    let uri = (() => {
+      let { user, pwd, host, port, db } = config.database;
+      return `mongodb://${(user && pwd) ? `${user}:${escape(pwd)}@` : ''}${host || 'localhost'}:${port || 27017}/${db || 'neproute'}`;
+    })();
     MongoClient.connect(uri, (err, d) => {
-      this.db = d;
+      db = d;
+      cb(null);
     });
   }
 
-  db: Db;
   config: Config;
 }
 
@@ -48,24 +52,24 @@ export interface RouteRoutesSchema {
 
 class Route {
   findHost(host: string, cb: (err: Error, d: RouteSchema) => void): void {
-    database.db.collection('route').findOne({ host: host }, (err, d) => {
+    db.collection('route').findOne({ host: host }, (err, d) => {
       if (err) { cb(err, null); return; }
       cb(null, d);
     });
   }
 
   findId(id: string, cb: (err: Error, d: RouteSchema) => void): void {
-    database.db.collection('route').findOne({ _id: ObjectID.createFromHexString(id) }, (err, d) => {
+    db.collection('route').findOne({ _id: ObjectID.createFromHexString(id) }, (err, d) => {
       if (err) { cb(err, null); return; }
       cb(null, d);
     });
   }
 
   insert(route: RouteSchema, cb: (err: Error, d) => void): void {
-    database.db.collection('route').findOne({ host: route.host }, (err, d) => {
+    db.collection('route').findOne({ host: route.host }, (err, d) => {
       if (err) { cb(err, null); return; }
       if (d) { cb(null, { ok: 0 }); return; }
-      database.db.collection('route').insertOne(route, {w: 1}, (err) => {
+      db.collection('route').insertOne(route, {w: 1}, (err) => {
         if (err) { cb(err, null); return; }
         cb(null, { ok: 1 });
       });
@@ -73,7 +77,7 @@ class Route {
   }
 
   delete(host: string, cb: (err: Error, d) => void): void {
-    database.db.collection('route').deleteOne({ host: host }, (err, d) => {
+    db.collection('route').deleteOne({ host: host }, (err, d) => {
       if (err) { cb(err, null); return; }
       cb(null, d);
     });
@@ -82,7 +86,7 @@ class Route {
 
 class DataRoute {
   find(id: string, cb: (err: Error, d: DataSchema) => void): void {
-    database.db.collection('data', (err, c) => {
+    db.collection('data', (err, c) => {
       if (err) { cb(err, null); return; }
       c.findOne({ _id: ObjectID.createFromHexString(id) }, (err, d) => {
         if (err) { cb(err, null); return; }
@@ -92,7 +96,7 @@ class DataRoute {
   }
 
   insert(data: DataInsertSchema, cb: (err: Error, d) => void): void {
-    database.db.collection('data', (err, c) => {
+    db.collection('data', (err, c) => {
       if (err) { cb(err, null); return; }
       c.insertOne(data, {w: 1}, (err) => {
         if (err) { cb(err, null); return; }
@@ -102,7 +106,7 @@ class DataRoute {
   }
 
   delete(id: string, cb: (err: Error, d) => void): void {
-    database.db.collection('data', (err, c) => {
+    db.collection('data', (err, c) => {
       if (err) { cb(err, null); return; }
       c.deleteOne({ _id: ObjectID.createFromHexString(id) }, (err, d) => {
         if (err) { cb(err, null); return; }
@@ -123,7 +127,7 @@ export interface TokenInsertSchema {
 
 class Token {
   find(id: string, cb: (err: Error, d: TokenSchema) => void): void {
-    database.db.collection('token', (err, c) => {
+    db.collection('token', (err, c) => {
       if (err) { cb(err, null); return; }
       c.findOne({ _id: ObjectID.createFromHexString(id) }, (err, d) => {
         if (err) { cb(err, null); return; }
