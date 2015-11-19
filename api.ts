@@ -26,23 +26,13 @@ api.use((req, res, next) => {
   next();
 });
 
-api.route('/route/host/:host')
-  .get((req, res) => {
-    let { host } = req.params;
-    route.findHost(host, (err, d) => {
-      if (err) { res.sendStatus(500); return; }
-      res.json(d);
-    });
-  })
-  .put((req, res) => {
-    ;
-  })
-  .post((req, res) => {
-
-  })
-  .delete((req, res) => {
-    ;
+api.get('/route/host/:host', (req, res) => {
+  let { host } = req.params;
+  route.findHost(host, (err, d) => {
+    if (err) { res.sendStatus(500); return; }
+    res.json(d);
   });
+});
 
 api.get('/route/:id', (req, res) => {
   let { id } = req.params;
