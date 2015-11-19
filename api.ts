@@ -68,7 +68,6 @@ api.put('/route/:id', (req, res) => {
     if (err) { res.sendStatus(500); return; }
     if (!d) { res.sendStatus(404); return; }
     let b = req.body;
-    console.log(b);
     let k: RouteSchema = {
       host: b.host || d.host,
       ssl: b.ssl || d.ssl,
@@ -88,6 +87,7 @@ api.put('/route/:id', (req, res) => {
 
 api.post('/route', (req, res) => {
   let b = req.body;
+  if (!b.host || !b.owner) { res.sendStatus(400); return; }
   let d: RouteSchema = {
     host: b.host,
     ssl: b.ssl || 'no',
