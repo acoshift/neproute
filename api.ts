@@ -34,6 +34,15 @@ api.get('/route/host/:host', (req, res) => {
   });
 });
 
+api.get('/route/owner/:owner', (req, res) => {
+  let { owner } = req.params;
+  let { limit, skip } = req.query;
+  database.db.collection('route').find({ owner: owner }, { limit: limit, skip: skip }).toArray((err, d) => {
+    if (err) { res.sendStatus(500); return; }
+    res.json(d);
+  });
+});
+
 api.get('/route/:id', (req, res) => {
   let { id } = req.params;
   route.findId(id, (err, d) => {
