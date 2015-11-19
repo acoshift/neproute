@@ -5,9 +5,8 @@ import * as https from "https";
 import * as tls from "tls";
 import * as express from "express";
 import * as ip from "ip";
-import { ObjectID } from "mongodb";
 import { Config } from "./config";
-import { connect, db } from "./db";
+import { connect, db, objectId } from "./db";
 import * as api from "./api";
 
 var config: Config = require('./config');
@@ -41,7 +40,7 @@ app.use((req, res, next) => {
       res.redirect(`http://${hostname + url}`);
       return;
     }
-    db.collection('data').findOne({ _id: ObjectID.createFromHexString(d.routes[0].data) }, (err, d) => {
+    db.collection('data').findOne({ _id: objectId(d.routes[0].data) }, (err, d) => {
       if (err) { res.sendStatus(500); return; }
       res.send(d.data);
     });

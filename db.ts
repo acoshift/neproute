@@ -18,6 +18,14 @@ export function connect(config: Config, cb: (err: Error) => void): void {
   });
 }
 
+export function objectId(id: string): ObjectID {
+  let _id = null;
+  try {
+    _id = ObjectID.createFromHexString(id);
+  } catch (e) { }
+  return _id;
+}
+
 export interface Timestamps {
   createAt: number,
   updateAt: number

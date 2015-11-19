@@ -1,10 +1,8 @@
 /// <reference path="typings/tsd.d.ts"/>
 
 import * as express from "express";
-import { Request, Response } from "express";
 import * as bodyParser from "body-parser";
-import { ObjectID } from "mongodb";
-import { db, route, dataRoute, token, RouteSchema, DataInsertSchema } from "./db";
+import { db, objectId, route, dataRoute, token, RouteSchema, DataInsertSchema, SslSchema } from "./db";
 
 // TODO: check user permission for each operator
 
@@ -29,6 +27,14 @@ api.use((req, res, next) => {
   next();
 });
 
+api.get('/route', (req, res) => {
+  let { limit, skip } = req.query;
+  db.collection('route').find({}, { limit: limit || 10, skip: skip }).toArray((err, d) => {
+    if (err) { res.sendStatus(500); return; }
+    res.json(d);
+  });
+});
+
 api.get('/route/host/:host', (req, res) => {
   let { host } = req.params;
   db.collection('route').findOne({ host: host }, (err, d) => {
@@ -48,7 +54,7 @@ api.get('/route/owner/:owner', (req, res) => {
 
 api.get('/route/:id', (req, res) => {
   let { id } = req.params;
-  db.collection('route').findOne({ _id: ObjectID.createFromHexString(id) }, (err, d) => {
+  db.collection('route').findOne({ _id: objectId(id) }, (err, d) => {
     if (err) { res.sendStatus(500); return; }
     res.json(d);
   });
@@ -56,7 +62,7 @@ api.get('/route/:id', (req, res) => {
 
 api.delete('/route/:id', (req, res) => {
   let { id } = req.params;
-  db.collection('route').deleteOne({ _id: ObjectID.createFromHexString(id) }, { w: 1 }, (err, d) => {
+  db.collection('route').deleteOne({ _id: objectId(id) }, { w: 1 }, (err, d) => {
     if (err) { res.sendStatus(500); return; }
     res.json(d);
   });
@@ -64,7 +70,7 @@ api.delete('/route/:id', (req, res) => {
 
 api.put('/route/:id', (req, res) => {
   let { id } = req.params;
-  db.collection('route').findOne({ _id: ObjectID.createFromHexString(id) }, (err, d: RouteSchema) => {
+  db.collection('route').findOne({ _id: objectId(id) }, (err, d: RouteSchema) => {
     if (err) { res.sendStatus(500); return; }
     if (!d) { res.sendStatus(404); return; }
     let b = req.body;
@@ -78,7 +84,7 @@ api.put('/route/:id', (req, res) => {
       createAt: d.createAt,
       updateAt: Date.now()
     };
-    db.collection('route').updateOne({ _id: ObjectID.createFromHexString(id) }, k, (err, d) => {
+    db.collection('route').updateOne({ _id: objectId(id) }, k, (err, d) => {
       if (err) { res.sendStatus(500); return; }
       res.json(d);
     });
@@ -98,10 +104,89 @@ api.post('/route', (req, res) => {
     createAt: Date.now(),
     updateAt: Date.now()
   };
-  route.insert(d, (err, r) => {
+  db.collection('route').findOne({ host: d.host }, (err, k) => {
     if (err) { res.sendStatus(500); return; }
-    r.insert = d;
-    res.json(r);
+    if (k) { res.json({ ok: 0 }); return; }
+    db.collection('route').insertOne(d, { w: 1 }, (err, r) => {
+      if (err) { res.sendStatus(500); return; }
+      r.insert = d;
+      res.json(r);
+    });
+  });
+});
+
+api.get('/ssl', (req, res) => {
+  let { limit, skip } = req.query;
+  db.collection('ssl').find({}, { limit: limit || 10, skip: skip }).toArray((err, d) => {
+    if (err) { res.sendStatus(500); return; }
+    res.json(d);
+  });
+});
+
+api.get('/ssl/host/:host', (req, res) => {
+  let { host } = req.params;
+  db.collection('ssl').findOne({ host: host }, (err, d) => {
+    if (err) { res.sendStatus(500); return; }
+    res.json(d);
+  });
+});
+
+api.get('/ssl/:id', (req, res) => {
+  let { id } = req.params;
+  db.collection('ssl').findOne({ _id: objectId(id) }, (err, d) => {
+    if (err) { res.sendStatus(500); return; }
+    res.json(d);
+  });
+});
+
+api.delete('/ssl/:id', (req, res) => {
+  let { id } = req.params;
+  db.collection('ssl').deleteOne({ _id: objectId(id) }, { w: 1 }, (err, d) => {
+    if (err) { res.sendStatus(500); return; }
+    res.json(d);
+  });
+});
+
+api.put('/ssl/:id', (req, res) => {
+  let { id } = req.params;
+  db.collection('ssl').findOne({ _id: objectId(id) }, (err, d: SslSchema) => {
+    if (err) { res.sendStatus(500); return; }
+    if (!d) { res.sendStatus(404); return; }
+    let b = req.body;
+    let k: SslSchema = {
+      host: b.host || d.host,
+      ssl: b.ssl || d.ssl,
+      createAt: d.createAt,
+      updateAt: Date.now()
+    };
+    db.collection('ssl').updateOne({ _id: objectId(id) }, k, (err, d) => {
+      if (err) { res.sendStatus(500); return; }
+      res.json(d);
+    });
+  });
+});
+
+api.post('/ssl', (req, res) => {
+  let b = req.body;
+  if (!b.host || !b.ssl || !b.ssl.cert || !b.ssl.key) { res.sendStatus(400); return; }
+  let d: SslSchema = {
+    host: b.host,
+    ssl: {
+      cert: b.ssl.cert || '',
+      key: b.ssl.key || '',
+      ca: b.ssl.ca || ''
+    },
+    createAt: Date.now(),
+    updateAt: Date.now()
+  };
+  db.collection('ssl').findOne({ host: d.host }, (err, k) => {
+    if (err) { res.sendStatus(500); return; }
+    if (k) { res.json({ ok: 0 }); return; }
+    db.collection('ssl').insertOne(d, { w: 1 }, (err, r) => {
+      if (err) { res.sendStatus(500); return; }
+      r.insert = d;
+      res.json(r);
+    });
   });
 });
 
