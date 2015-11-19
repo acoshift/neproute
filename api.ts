@@ -28,7 +28,7 @@ api.use((req, res, next) => {
 
 api.get('/route/host/:host', (req, res) => {
   let { host } = req.params;
-  route.findHost(host, (err, d) => {
+  database.db.collection('route').findOne({ host: host }, (err, d) => {
     if (err) { res.sendStatus(500); return; }
     res.json(d);
   });
