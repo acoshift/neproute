@@ -11,7 +11,6 @@ class Database {
     let uri = `mongodb://${(user && pwd) ? `${user}:${escape(pwd)}@` : ''}${host || 'localhost'}:${port || 27017}/${db || 'neproute'}`;
     MongoClient.connect(uri, (err, d) => {
       this.db = d;
-      sslRoute.reload((err) => { callback(err, d); });
     });
   }
 
@@ -81,40 +80,6 @@ class Route {
   }
 };
 
-export interface SSL {
-  cert: any;
-  key: any;
-  ca: any;
-}
-
-export interface ASSLRoute {
-  host: string;
-  ssl: SSL;
-  createAt: number;
-  updateAt: number;
-}
-
-class SSLRoute {
-  _ssls = [];
-
-  reload(cb): void {
-    database.db.collection('ssl').find().toArray((err, ds) => {
-      if (err) { cb(err); return; }
-      this._ssls = [];
-      ds.forEach((x) => { if (x.host) this._ssls[x.host] = x.ssl })
-      cb(null);
-    });
-  }
-
-  get(host: string): SSL {
-    return this._ssls[host];
-  }
-
-  default(): SSL {
-    return this._ssls[database.config.host] || { cert: '', key: '', ca: '' };
-  }
-}
-
 class DataRoute {
   find(id: string, cb: (err: Error, d: DataSchema) => void): void {
     database.db.collection('data', (err, c) => {
@@ -173,6 +138,5 @@ class Token {
 }
 
 export var route = new Route();
-export var sslRoute = new SSLRoute();
 export var dataRoute = new DataRoute();
 export var token = new Token();

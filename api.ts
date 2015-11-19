@@ -4,7 +4,7 @@ import * as express from "express";
 import { Request, Response } from "express";
 import * as bodyParser from "body-parser";
 import { ObjectID } from "mongodb";
-import { database, route, sslRoute, dataRoute, token, RouteSchema, DataInsertSchema } from "./db";
+import { database, route, dataRoute, token, RouteSchema, DataInsertSchema } from "./db";
 
 var db = database.db;
 
