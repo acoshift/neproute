@@ -5,6 +5,7 @@ import * as https from "https";
 import * as tls from "tls";
 import * as express from "express";
 import { Request, Response } from "express";
+import * as ip from "ip";
 import { Config } from "./config";
 import { database, route, sslRoute, dataRoute } from "./db";
 import * as api from "./api";
@@ -24,9 +25,23 @@ database.connect(config, (err, db) => {
 
   app.use((req, res, next) => {
     let { hostname, url } = req;
+    try {
+      if (ip.isEqual(hostname, ip.address())) {
+        res.send(`NepRoute https://github.com/acoshift/neproute<br>If you don't know this page, please use https://${config.host}`);
+        return;
+      }
+    } catch(e) {}
     route.findHost(hostname, (err, d) => {
       if (err) { res.sendStatus(500); return; }
       if (!d) { res.sendStatus(404); return; }
+      if (!req.secure && d.ssl == 'prefer') {
+        res.redirect(`https://${hostname + url}`);
+        return;
+      }
+      if (req.secure && d.ssl == 'no') {
+        res.redirect(`http://${hostname + url}`);
+        return;
+      }
       if (url.length > 1 && url.substring(url.length - 1) == '/')
         url = url.substring(0, url.length - 1);
       if (!d.routes[url]) { res.sendStatus(404); return; }

@@ -24,24 +24,23 @@ export var database = new Database();
 
 export interface RouteSchema {
   host: string;
-  ssl: RouteSSLSchema;
+  ssl: string;
   enabled: boolean;
   desc: string;
   owner: string;
   routes: RouteRoutesSchema[];
   meta: RouteMetaSchema;
-  createAt: Date;
-  updateAt: Date;
-};
-
-export interface RouteSSLSchema {
-  key: string;
-  cert: string;
-  ca: string;
+  createAt: number;
+  updateAt: number;
 };
 
 export interface DataSchema {
   id: string;
+  data: any;
+}
+
+export interface DataInsertSchema {
+  _id?: ObjectID;
   data: any;
 }
 
@@ -68,7 +67,31 @@ class Route {
   findId(id: string, cb: (err: Error, d: RouteSchema) => void): void {
     database.db.collection('route', (err, c) => {
       if (err) { cb(err, null); return; }
-      c.findOne({ _id: id }, (err, d) => {
+      c.findOne({ _id: ObjectID.createFromHexString(id) }, (err, d) => {
+        if (err) { cb(err, null); return; }
+        cb(null, d);
+      });
+    });
+  }
+
+  insert(route: RouteSchema, cb: (err: Error, d) => void): void {
+    database.db.collection('route', (err, c) => {
+      if (err) { cb(err, null); return; }
+      c.findOne({ host: route.host }, (err, d) => {
+        if (err) { cb(err, null); return; }
+        if (d) { cb(null, { ok: 0 }); return; }
+        c.insertOne(route, {w: 1}, (err) => {
+          if (err) { cb(err, null); return; }
+          cb(null, { ok: 1 });
+        });
+      });
+    });
+  }
+
+  delete(host: string, cb: (err: Error, d) => void): void {
+    database.db.collection('route', (err, c) => {
+      if (err) { cb(err, null); return; }
+      c.deleteOne({ host: host }, (err, d) => {
         if (err) { cb(err, null); return; }
         cb(null, d);
       });
@@ -82,11 +105,11 @@ export interface SSL {
   ca: any;
 }
 
-interface ASSLRoute {
+export interface ASSLRoute {
   host: string;
   ssl: SSL;
-  createAt: Date;
-  updateAt: Date;
+  createAt: number;
+  updateAt: number;
 }
 
 class SSLRoute {
@@ -117,16 +140,40 @@ class DataRoute {
   find(id: string, cb: (err: Error, d: DataSchema) => void): void {
     database.db.collection('data', (err, c) => {
       if (err) { cb(err, null); return; }
-      c.findOne({ _id: id }, (err, d) => {
+      c.findOne({ _id: ObjectID.createFromHexString(id) }, (err, d) => {
         if (err) { cb(err, null); return; }
         cb(null, d);
       });
-    })
+    });
+  }
+
+  insert(data: DataInsertSchema, cb: (err: Error, d) => void): void {
+    database.db.collection('data', (err, c) => {
+      if (err) { cb(err, null); return; }
+      c.insertOne(data, {w: 1}, (err) => {
+        if (err) { cb(err, null); return; }
+        cb(null, { id: data._id.toHexString() });
+      });
+    });
+  }
+
+  delete(id: string, cb: (err: Error, d) => void): void {
+    database.db.collection('data', (err, c) => {
+      if (err) { cb(err, null); return; }
+      c.deleteOne({ _id: ObjectID.createFromHexString(id) }, (err, d) => {
+        if (err) { cb(err, null); return; }
+        cb(null, d);
+      });
+    });
   }
 }
 
-interface TokenSchema {
+export interface TokenSchema {
   id: string;
+  username: string;
+}
+
+export interface TokenInsertSchema {
   username: string;
 }
 
@@ -134,7 +181,7 @@ class Token {
   find(id: string, cb: (err: Error, d: TokenSchema) => void): void {
     database.db.collection('token', (err, c) => {
       if (err) { cb(err, null); return; }
-      c.findOne({ _id: id }, (err, d) => {
+      c.findOne({ _id: ObjectID.createFromHexString(id) }, (err, d) => {
         if (err) { cb(err, null); return; }
         cb(null, { id: d._id, username: d.username });
       })
