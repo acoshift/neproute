@@ -3,6 +3,7 @@
 import * as express from "express";
 import { Request, Response } from "express";
 import * as bodyParser from "body-parser";
+import { ObjectID } from "mongodb";
 import { database, route, sslRoute, dataRoute, token, RouteSchema, DataInsertSchema } from "./db";
 
 var api = express();
@@ -45,9 +46,9 @@ api.get('/route/owner/:owner', (req, res) => {
 
 api.get('/route/:id', (req, res) => {
   let { id } = req.params;
-  route.findId(id, (err, d) => {
+  database.db.collection('route').findOne({ _id: ObjectID.createFromHexString(id) }, (err, d) => {
     if (err) { res.sendStatus(500); return; }
-    res.status(200).json(d);
+    res.json(d);
   });
 });
 
