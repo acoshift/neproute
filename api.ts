@@ -54,6 +54,14 @@ api.get('/route/:id', (req, res) => {
   });
 });
 
+api.delete('/route/:id', (req, res) => {
+  let { id } = req.params;
+  database.db.collection('route').deleteOne({ _id: ObjectID.createFromHexString(id) }, { w: 1 }, (err, d) => {
+    if (err) { res.sendStatus(500); return; }
+    res.json(d);
+  });
+});
+
 api.post('/route', (req, res) => {
   let b = req.body;
   let d: RouteSchema = {
