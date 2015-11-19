@@ -6,6 +6,8 @@ import * as bodyParser from "body-parser";
 import { ObjectID } from "mongodb";
 import { database, route, sslRoute, dataRoute, token, RouteSchema, DataInsertSchema } from "./db";
 
+var db = database.db;
+
 // TODO: check user permission for each operator
 
 var api = express();
@@ -31,7 +33,7 @@ api.use((req, res, next) => {
 
 api.get('/route/host/:host', (req, res) => {
   let { host } = req.params;
-  database.db.collection('route').findOne({ host: host }, (err, d) => {
+  db.collection('route').findOne({ host: host }, (err, d) => {
     if (err) { res.sendStatus(500); return; }
     res.json(d);
   });
@@ -40,7 +42,7 @@ api.get('/route/host/:host', (req, res) => {
 api.get('/route/owner/:owner', (req, res) => {
   let { owner } = req.params;
   let { limit, skip } = req.query;
-  database.db.collection('route').find({ owner: owner }, { limit: limit, skip: skip }).toArray((err, d) => {
+  db.collection('route').find({ owner: owner }, { limit: limit, skip: skip }).toArray((err, d) => {
     if (err) { res.sendStatus(500); return; }
     res.json(d);
   });
@@ -48,7 +50,7 @@ api.get('/route/owner/:owner', (req, res) => {
 
 api.get('/route/:id', (req, res) => {
   let { id } = req.params;
-  database.db.collection('route').findOne({ _id: ObjectID.createFromHexString(id) }, (err, d) => {
+  db.collection('route').findOne({ _id: ObjectID.createFromHexString(id) }, (err, d) => {
     if (err) { res.sendStatus(500); return; }
     res.json(d);
   });
@@ -56,7 +58,7 @@ api.get('/route/:id', (req, res) => {
 
 api.delete('/route/:id', (req, res) => {
   let { id } = req.params;
-  database.db.collection('route').deleteOne({ _id: ObjectID.createFromHexString(id) }, { w: 1 }, (err, d) => {
+  db.collection('route').deleteOne({ _id: ObjectID.createFromHexString(id) }, { w: 1 }, (err, d) => {
     if (err) { res.sendStatus(500); return; }
     res.json(d);
   });
