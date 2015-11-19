@@ -14,7 +14,7 @@
     "express",
     "route"
   ],
-  "author": "Thanatat Tamtan",
+  "author": "Thanatat Tamtan <acoshift@gmail.com>",
   "license": "ISC",
   "bugs": {
     "url": "https://github.com/acoshift/neproute/issues"
