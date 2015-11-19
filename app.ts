@@ -31,7 +31,9 @@ database.connect(config, (err, db) => {
         return;
       }
     } catch(e) {}
-    route.findHost(hostname, (err, d) => {
+    if (url.length > 1 && url.substring(url.length - 1) == '/')
+      url = url.substring(0, url.length - 1);
+    database.db.collection('route').findOne({ host: hostname, 'routes.route' : url }, [ 'host', 'enabled', 'ssl', 'routes.data' ], (err, d) => {
       if (err) { res.sendStatus(500); return; }
       if (!d) { res.sendStatus(404); return; }
       if (!req.secure && d.ssl == 'prefer') {
@@ -42,10 +44,8 @@ database.connect(config, (err, db) => {
         res.redirect(`http://${hostname + url}`);
         return;
       }
-      if (url.length > 1 && url.substring(url.length - 1) == '/')
-        url = url.substring(0, url.length - 1);
-      if (!d.routes[url]) { res.sendStatus(404); return; }
-      dataRoute.find(d.routes[url], (err, d) => {
+      console.log(d);
+      dataRoute.find(d.routes[0].data, (err, d) => {
         if (err) { res.sendStatus(500); return; }
         res.send(d.data);
       });
