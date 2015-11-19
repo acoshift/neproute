@@ -35,7 +35,7 @@ database.connect(config, (err, db) => {
       url = url.substring(0, url.length - 1);
     database.db.collection('route').findOne({ host: hostname, 'routes.route' : url }, [ 'host', 'enabled', 'ssl', 'routes.data' ], (err, d) => {
       if (err) { res.sendStatus(500); return; }
-      if (!d) { res.sendStatus(404); return; }
+      if (!d || !d.enabled) { res.sendStatus(404); return; }
       if (!req.secure && d.ssl == 'prefer') {
         res.redirect(`https://${hostname + url}`);
         return;
