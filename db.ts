@@ -55,46 +55,34 @@ export interface RouteMetaSchema {
 
 class Route {
   findHost(host: string, cb: (err: Error, d: RouteSchema) => void): void {
-    database.db.collection('route', (err, c) => {
+    database.db.collection('route').findOne({ host: host }, (err, d) => {
       if (err) { cb(err, null); return; }
-      c.findOne({ host: host }, (err, d) => {
-        if (err) { cb(err, null); return; }
-        cb(null, d);
-      });
+      cb(null, d);
     });
   }
 
   findId(id: string, cb: (err: Error, d: RouteSchema) => void): void {
-    database.db.collection('route', (err, c) => {
+    database.db.collection('route').findOne({ _id: ObjectID.createFromHexString(id) }, (err, d) => {
       if (err) { cb(err, null); return; }
-      c.findOne({ _id: ObjectID.createFromHexString(id) }, (err, d) => {
-        if (err) { cb(err, null); return; }
-        cb(null, d);
-      });
+      cb(null, d);
     });
   }
 
   insert(route: RouteSchema, cb: (err: Error, d) => void): void {
-    database.db.collection('route', (err, c) => {
+    database.db.collection('route').findOne({ host: route.host }, (err, d) => {
       if (err) { cb(err, null); return; }
-      c.findOne({ host: route.host }, (err, d) => {
+      if (d) { cb(null, { ok: 0 }); return; }
+      database.db.collection('route').insertOne(route, {w: 1}, (err) => {
         if (err) { cb(err, null); return; }
-        if (d) { cb(null, { ok: 0 }); return; }
-        c.insertOne(route, {w: 1}, (err) => {
-          if (err) { cb(err, null); return; }
-          cb(null, { ok: 1 });
-        });
+        cb(null, { ok: 1 });
       });
     });
   }
 
   delete(host: string, cb: (err: Error, d) => void): void {
-    database.db.collection('route', (err, c) => {
+    database.db.collection('route').deleteOne({ host: host }, (err, d) => {
       if (err) { cb(err, null); return; }
-      c.deleteOne({ host: host }, (err, d) => {
-        if (err) { cb(err, null); return; }
-        cb(null, d);
-      });
+      cb(null, d);
     });
   }
 };
@@ -116,14 +104,11 @@ class SSLRoute {
   _ssls = [];
 
   reload(cb): void {
-    database.db.collection('ssl', (err, c) => {
+    database.db.collection('ssl').find().toArray((err, ds) => {
       if (err) { cb(err); return; }
-      c.find().toArray((err, ds) => {
-        if (err) { cb(err); return; }
-        this._ssls = [];
-        ds.forEach((x) => { if (x.host) this._ssls[x.host] = x.ssl })
-        cb(null);
-      });
+      this._ssls = [];
+      ds.forEach((x) => { if (x.host) this._ssls[x.host] = x.ssl })
+      cb(null);
     });
   }
 
