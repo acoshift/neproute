@@ -11,8 +11,7 @@ class Database {
     let uri = `mongodb://${(user && pwd) ? `${user}:${escape(pwd)}@` : ''}${host || 'localhost'}:${port || 27017}/${db || 'neproute'}`;
     MongoClient.connect(uri, (err, d) => {
       this.db = d;
-      sslRoute.reload((err) => {});
-      callback(err, d)
+      sslRoute.reload((err) => { callback(err, d); });
     });
   }
 
