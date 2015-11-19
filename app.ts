@@ -51,6 +51,8 @@ app.use((req, res, next) => {
 connect(config, (err) => {
   if (err) { console.log(err); return; }
 
+  config.http && http.createServer(app).listen(config.http);
+
   var https_options = {
     SNICallback: (host, cb) => {
       db.collection('ssl').findOne({ host: host }, (err, d) => {
@@ -74,7 +76,6 @@ connect(config, (err) => {
       https_options.key = d.ssl.key || '';
       https_options.ca = d.ssl.ca || '';
     }
-    config.http && http.createServer(app).listen(config.http);
     config.https && https.createServer(https_options, app).listen(config.https);
   });
 });
