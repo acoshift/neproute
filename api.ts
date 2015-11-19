@@ -98,9 +98,10 @@ api.post('/route', (req, res) => {
     createAt: Date.now(),
     updateAt: Date.now()
   };
-  route.insert(d, (err, d) => {
+  route.insert(d, (err, r) => {
     if (err) { res.sendStatus(500); return; }
-    res.json(d);
+    r.insert = d;
+    res.json(r);
   });
 });
 
