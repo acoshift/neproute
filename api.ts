@@ -6,6 +6,8 @@ import * as bodyParser from "body-parser";
 import { ObjectID } from "mongodb";
 import { database, route, sslRoute, dataRoute, token, RouteSchema, DataInsertSchema } from "./db";
 
+// TODO: check user permission for each operator
+
 var api = express();
 
 api.use(bodyParser.json());
