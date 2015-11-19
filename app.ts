@@ -44,7 +44,6 @@ database.connect(config, (err, db) => {
         res.redirect(`http://${hostname + url}`);
         return;
       }
-      console.log(d);
       dataRoute.find(d.routes[0].data, (err, d) => {
         if (err) { res.sendStatus(500); return; }
         res.send(d.data);
