@@ -4,10 +4,10 @@ import * as http from "http";
 import * as https from "https";
 import * as tls from "tls";
 import * as express from "express";
-import { Request, Response } from "express";
 import * as ip from "ip";
+import { ObjectID } from "mongodb";
 import { Config } from "./config";
-import { database, route, sslRoute, dataRoute } from "./db";
+import { database } from "./db";
 import * as api from "./api";
 
 var config: Config = require('./config');
@@ -41,7 +41,7 @@ app.use((req, res, next) => {
       res.redirect(`http://${hostname + url}`);
       return;
     }
-    dataRoute.find(d.routes[0].data, (err, d) => {
+    database.db.collection('data').findOne({ _id: ObjectID.createFromHexString(d.routes[0].data) }, (err, d) => {
       if (err) { res.sendStatus(500); return; }
       res.send(d.data);
     });
