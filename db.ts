@@ -29,16 +29,6 @@ export interface RouteSchema {
   updateAt: number;
 };
 
-export interface RouteUpdateSchema {
-  host: string;
-  ssl: string;
-  enabled: boolean;
-  desc: string;
-  owner: string;
-  routes: RouteRoutesSchema[];
-  updateAt: number;
-};
-
 export interface DataSchema {
   id: string;
   data: any;

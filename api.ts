@@ -4,7 +4,7 @@ import * as express from "express";
 import { Request, Response } from "express";
 import * as bodyParser from "body-parser";
 import { ObjectID } from "mongodb";
-import { db, route, dataRoute, token, RouteSchema, DataInsertSchema, RouteUpdateSchema } from "./db";
+import { db, route, dataRoute, token, RouteSchema, DataInsertSchema } from "./db";
 
 // TODO: check user permission for each operator
 
@@ -66,14 +66,17 @@ api.put('/route/:id', (req, res) => {
   let { id } = req.params;
   db.collection('route').findOne({ _id: ObjectID.createFromHexString(id) }, (err, d: RouteSchema) => {
     if (err) { res.sendStatus(500); return; }
+    if (!d) { res.sendStatus(404); return; }
     let b = req.body;
-    let k: RouteUpdateSchema = {
+    console.log(b);
+    let k: RouteSchema = {
       host: b.host || d.host,
       ssl: b.ssl || d.ssl,
       enabled: b.enabled || d.enabled,
       desc: b.desc || d.desc,
       owner: b.owner || d.owner,
       routes: b.routes || d.routes,
+      createAt: d.createAt,
       updateAt: Date.now()
     };
     db.collection('route').updateOne({ _id: ObjectID.createFromHexString(id) }, k, (err, d) => {
