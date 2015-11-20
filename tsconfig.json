@@ -17,7 +17,8 @@
     "filesGlob": [
         "**/*.ts",
         "**/*.tsx",
-        "!node_modules/**"
+        "!node_modules/**",
+        "!static/**"
     ],
     "files": [
         "api.ts",
@@ -29,7 +30,6 @@
         "typings/ip/ip.d.ts",
         "typings/mime/mime.d.ts",
         "typings/mongodb/mongodb.d.ts",
-        "typings/mongoose/mongoose.d.ts",
         "typings/node/node.d.ts",
         "typings/serve-static/serve-static.d.ts",
         "typings/tsd.d.ts"
