@@ -1,6 +1,7 @@
 node_modules/
 typings/
 log/
+static/
 *.js
 *.min.js
 config.json
