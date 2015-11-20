@@ -191,9 +191,14 @@ api.post('/ssl', (req, res) => {
 });
 
 api.post('/data', (req, res) => {
-  let d: DataInsertSchema = {
-    data: req.body.data
-  }
+  let d: DataInsertSchema = { data: null };
+
+  if (req.body.data && req.body.data.base64)
+    d.data = new Buffer(req.body.data.base64, 'base64').toString('ascii');
+  else
+    d.data = req.body.data;
+
+  if (!d.data) { res.sendStatus(400); }
   dataRoute.insert(d, (err, d) => {
     if (err) { res.sendStatus(500); return; }
     res.json(d);
