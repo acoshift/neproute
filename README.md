@@ -8,7 +8,8 @@ Route your web with nep nep power!
 
 1. Clone our nep `$ git clone https://github.com/acoshift/neproute.git`
 2. Install node modules `$ npm install`
-3. Release nep power~! `$ node app.js`
+3. Compile TypeScript to JavaScript `$ tsc app.ts`
+4. Release nep power~! `$ node app.js`
 
 ## API Documentation
 > // TODO
