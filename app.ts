@@ -14,18 +14,10 @@ var config: Config = require('./config');
 
 var app = express();
 
-app.use('/api', (req, res, next) => {
-  if (req.hostname == 'localhost' || req.hostname == config.host) {
-    next();
-  }
-}, api);
-
-app.use('/node_modules', express.static(path.join(__dirname, '/static/node_modules')));
-
 app.use((req, res, next) => {
   let { hostname, url } = req;
   try {
-    if (ip.isEqual(hostname, ip.address())) {
+    if (ip.isEqual(hostname, ip.address()) || ip.isEqual(hostname, '127.0.0.1')) {
       res.send(`NepRoute https://github.com/acoshift/neproute<br>If you don't know this page, please use https://${config.host}`);
       return;
     }
@@ -34,7 +26,8 @@ app.use((req, res, next) => {
     url = url.substring(0, url.length - 1);
   db.collection('route').findOne({ host: hostname, 'routes.route' : url }, [ 'host', 'enabled', 'ssl', 'routes.data' ], (err, d) => {
     if (err) { res.sendStatus(500); return; }
-    if (!d || !d.enabled) { res.sendStatus(404); return; }
+    if (!d) { next(); return; }
+    if (!d.enabled) { res.sendStatus(404); return; }
     if (!req.secure && d.ssl == 'prefer') {
       res.redirect(`https://${hostname + url}`);
       return;
@@ -46,8 +39,22 @@ app.use((req, res, next) => {
     db.collection('data').findOne({ _id: objectId(d.routes[0].data) }, (err, d) => {
       if (err) { res.sendStatus(500); return; }
       res.send(d.data);
+      return;
     });
   });
+});
+
+app.use('/api', (req, res, next) => {
+  if (req.hostname == 'localhost' || req.hostname == config.host) {
+    next();
+  }
+}, api);
+
+app.use('/node_modules', express.static(path.join(__dirname, '/static/node_modules')));
+
+
+app.use((req, res) => {
+  res.sendStatus(404);
 });
 
 connect(config, (err) => {
