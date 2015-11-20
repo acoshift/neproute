@@ -2,6 +2,7 @@
 
 import * as http from "http";
 import * as https from "https";
+import * as path from "path";
 import * as tls from "tls";
 import * as express from "express";
 import * as ip from "ip";
@@ -18,6 +19,8 @@ app.use('/api', (req, res, next) => {
     next();
   }
 }, api);
+
+app.use('/node_modules', express.static(path.join(__dirname, '/static/node_modules')));
 
 app.use((req, res, next) => {
   let { hostname, url } = req;
