@@ -50,8 +50,7 @@ app.use('/api', (req, res, next) => {
   }
 }, api);
 
-app.use('/node_modules', express.static(path.join(__dirname, '/static/node_modules')));
-
+app.use('/_', express.static(path.join(__dirname, '/static')));
 
 app.use((req, res) => {
   res.sendStatus(404);
