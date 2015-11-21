@@ -12,27 +12,22 @@
         "removeComments": true,
         "noLib": false,
         "preserveConstEnums": true,
-        "suppressImplicitAnyIndexErrors": true
+        "suppressImplicitAnyIndexErrors": true,
+        "experimentalAsyncFunctions": true,
+        "outDir": "build/"
     },
     "filesGlob": [
         "**/*.ts",
         "**/*.tsx",
         "!node_modules/**",
+        "!typings/**",
         "!build/**"
     ],
     "files": [
         "api.ts",
         "app.ts",
         "config.d.ts",
-        "db.ts",
-        "typings/body-parser/body-parser.d.ts",
-        "typings/express/express.d.ts",
-        "typings/ip/ip.d.ts",
-        "typings/mime/mime.d.ts",
-        "typings/mongodb/mongodb.d.ts",
-        "typings/node/node.d.ts",
-        "typings/serve-static/serve-static.d.ts",
-        "typings/tsd.d.ts"
+        "db.ts"
     ],
     "atom": {
         "rewriteTsconfig": true
