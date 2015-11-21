@@ -4,5 +4,9 @@ log/
 static/
 build/
 *.js
-*.min.js
+*.js.map
 config.json
+.vs/
+*.dat
+*.sln
+*.njsproj
