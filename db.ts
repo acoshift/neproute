@@ -65,7 +65,7 @@ export interface RouteRoutesSchema {
   data: string; // => DataSchema
 };
 
-class Route {
+export class Route {
   findHost(host: string, cb: (err: Error, d: RouteSchema) => void): void {
     db.collection('route').findOne({ host: host }, (err, d) => {
       if (err) { cb(err, null); return; }
@@ -99,7 +99,7 @@ class Route {
   }
 };
 
-class DataRoute {
+export class DataRoute {
   find(id: string, cb: (err: Error, d: DataSchema) => void): void {
     db.collection('data', (err, c) => {
       if (err) { cb(err, null); return; }
@@ -140,7 +140,7 @@ export interface TokenInsertSchema {
   username: string;
 }
 
-class Token {
+export class Token {
   find(id: string, cb: (err: Error, d: TokenSchema) => void): void {
     db.collection('token', (err, c) => {
       if (err) { cb(err, null); return; }
