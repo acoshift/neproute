@@ -1,4 +1,5 @@
 /// <reference path="typings/tsd.d.ts"/>
+'use strict';
 
 import * as express from "express";
 import * as bodyParser from "body-parser";

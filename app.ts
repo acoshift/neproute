@@ -1,4 +1,5 @@
 /// <reference path="typings/tsd.d.ts"/>
+'use strict';
 
 import * as http from "http";
 import * as https from "https";

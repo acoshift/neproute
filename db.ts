@@ -1,4 +1,5 @@
 /// <reference path="typings/tsd.d.ts"/>
+'use strict';
 
 import { escape } from "querystring";
 import { MongoClient, Db, ObjectID } from "mongodb";
