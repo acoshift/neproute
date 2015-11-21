@@ -18,7 +18,7 @@
         "**/*.ts",
         "**/*.tsx",
         "!node_modules/**",
-        "!static/**"
+        "!build/**"
     ],
     "files": [
         "api.ts",
