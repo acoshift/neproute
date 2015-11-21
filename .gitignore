@@ -3,6 +3,7 @@ typings/
 log/
 build/
 obj/
+bin/
 *.map
 .vs/
 *.dat
