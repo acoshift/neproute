@@ -6,6 +6,7 @@ obj/
 bin/
 *.map
 .vs/
+.vscode/
 *.dat
 *.sln
 *.njsproj
