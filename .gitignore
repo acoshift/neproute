@@ -1,11 +1,9 @@
 node_modules/
 typings/
 log/
-static/
 build/
-*.js
-*.js.map
-config.json
+obj/
+*.map
 .vs/
 *.dat
 *.sln
