@@ -13,7 +13,6 @@
         "noLib": false,
         "preserveConstEnums": true,
         "suppressImplicitAnyIndexErrors": true,
-        "experimentalAsyncFunctions": true,
         "outDir": "build/"
     },
     "filesGlob": [
