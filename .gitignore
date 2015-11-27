@@ -1,12 +1,7 @@
 node_modules/
 typings/
-log/
-build/
-obj/
-bin/
 *.map
-.vs/
 .vscode/
-*.dat
-*.sln
-*.njsproj
+config/
+config.json
+*.js

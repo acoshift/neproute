@@ -12,8 +12,7 @@
         "removeComments": true,
         "noLib": false,
         "preserveConstEnums": true,
-        "suppressImplicitAnyIndexErrors": true,
-        "outDir": "build/"
+        "suppressImplicitAnyIndexErrors": true
     },
     "filesGlob": [
         "**/*.ts",
@@ -23,10 +22,7 @@
         "!build/**"
     ],
     "files": [
-        "api.ts",
-        "app.ts",
-        "config.d.ts",
-        "db.ts"
+        "index.ts"
     ],
     "atom": {
         "rewriteTsconfig": true

@@ -2,7 +2,7 @@
   "name": "neproute",
   "version": "0.0.1",
   "description": "",
-  "main": "app.js",
+  "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -21,9 +21,6 @@
   },
   "homepage": "https://github.com/acoshift/neproute#readme",
   "dependencies": {
-    "body-parser": "^1.14.1",
-    "express": "^4.13.3",
-    "ip": "^1.1.0",
-    "mongodb": "^2.0.48"
+    "express": "^4.13.3"
   }
 }
