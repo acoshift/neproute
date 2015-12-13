@@ -1,5 +1,4 @@
 /// <reference path="typings/tsd.d.ts"/>
-'use strict';
 
 import * as express from "express";
 import * as http from "http";
@@ -7,6 +6,8 @@ import * as https from "https";
 import * as fs from "fs";
 import * as path from "path";
 import * as tls from "tls";
+
+var app = express();
 
 interface AppConfig {
   http: number;
@@ -82,21 +83,12 @@ var watcher = fs.watch(configDir, (event, fn) => {
 
 reloadConfig();
 
-var app = express();
-
-app.use((req, res) => {
+app.use((req, res, next) => {
   let k = config.filter((x) => {
-    return x.domain.some((x) => x == req.hostname);
+    return x.domain.some((x) => x === req.hostname + req.url || x === req.hostname);
   });
-  if (!k[0]) {
-    res.sendStatus(400);
-    return;
-  }
-
-  if (k[0].ssl && k[0].ssl.force && !req.secure) {
-    res.redirect(`https://${req.hostname}${req.url}`);
-    return;
-  }
+  if (!k[0]) return res.sendStatus(400);
+  if (k[0].ssl && k[0].ssl.force && !req.secure) return res.redirect(`https://${req.hostname}${req.url}`);
 
   let opt: http.RequestOptions = {
     host: k[0].host,
@@ -106,7 +98,12 @@ app.use((req, res) => {
     headers: req.headers
   }
 
-  req.pipe(http.request(opt, (r) => { res.writeHead(r.statusCode, r.headers); r.pipe(res, { end: true }); }), { end: true });
+  req.pipe(http.request(opt, (r) => {
+    res.writeHead(r.statusCode, r.headers);
+    r.pipe(res, { end: true });
+  }), { end: true }).on('error', (e) => {
+    res.sendStatus(500);
+  });
 });
 
 var https_options = {
@@ -114,7 +111,7 @@ var https_options = {
     let k = config.filter((x) => {
       return x.domain.some((x) => x == host);
     });
-    if (!k[0]) { cb(null, null); return; }
+    if (!k[0] || !k[0].ssl) { cb(null, null); return; }
     let r = tls.createSecureContext({
       cert: k[0].ssl.cert,
       key: k[0].ssl.key,

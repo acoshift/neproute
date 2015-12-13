@@ -5,3 +5,4 @@ typings/
 config/
 config.json
 *.js
+*.log
