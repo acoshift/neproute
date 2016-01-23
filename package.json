@@ -1,7 +1,7 @@
 {
   "name": "neproute",
   "version": "0.0.1",
-  "description": "",
+  "description": "Reverse proxy",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
@@ -11,16 +11,17 @@
     "url": "git+https://github.com/acoshift/neproute.git"
   },
   "keywords": [
-    "express",
-    "route"
+    "reverse-proxy"
   ],
   "author": "Thanatat Tamtan <acoshift@gmail.com>",
-  "license": "ISC",
+  "license": "MIT",
   "bugs": {
     "url": "https://github.com/acoshift/neproute/issues"
   },
   "homepage": "https://github.com/acoshift/neproute#readme",
   "dependencies": {
-    "express": "^4.13.3"
+    "compression": "^1.6.1",
+    "express": "^5.0.0-alpha.2",
+    "lodash": "^4.0.0"
   }
 }

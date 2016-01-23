@@ -1,8 +1,7 @@
 node_modules/
 typings/
 *.map
-.vscode/
 config/
-config.json
-*.js
+src/config.ts
 *.log
+build/

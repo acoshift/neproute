@@ -12,18 +12,23 @@
         "removeComments": true,
         "noLib": false,
         "preserveConstEnums": true,
-        "suppressImplicitAnyIndexErrors": true
+        "suppressImplicitAnyIndexErrors": true,
+        "outDir": "build"
     },
     "filesGlob": [
-        "**/*.ts",
-        "**/*.tsx",
+        "src/**/*.ts",
+        "src/**/*.tsx",
         "!node_modules/**",
-        "!typings/**",
-        "!build/**"
+        "!build/**",
+        "typings/tsd.d.ts"
     ],
     "files": [
-        "index.ts"
+        "src/config.ts",
+        "src/index.ts",
+        "typings/tsd.d.ts"
     ],
+    "compileOnSave": true,
+    "buildOnSave": false,
     "atom": {
         "rewriteTsconfig": true
     }

@@ -9,13 +9,16 @@
       "commit": "fc341765ebbb04b7109981a25dced01f488f4d94"
     },
     "node/node.d.ts": {
-      "commit": "16134c168d021351acb1673ee9659644fc58c424"
+      "commit": "7fffbd3e040a93c244777e3be04cd6223ac69301"
     },
     "serve-static/serve-static.d.ts": {
       "commit": "fc341765ebbb04b7109981a25dced01f488f4d94"
     },
     "mime/mime.d.ts": {
       "commit": "fc341765ebbb04b7109981a25dced01f488f4d94"
+    },
+    "lodash/lodash.d.ts": {
+      "commit": "7fffbd3e040a93c244777e3be04cd6223ac69301"
     }
   }
 }
