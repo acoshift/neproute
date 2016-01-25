@@ -67,7 +67,7 @@ function load(c: Config): Config {
       host: c.host,
       port: c.port,
       prefix: c.prefix || '',
-      enabled: c.enabled || false,
+      enabled: c.enabled,
       ssl: c.ssl ? {
         cert: decode(c.ssl.cert),
         key: decode(c.ssl.key),
@@ -80,7 +80,6 @@ function load(c: Config): Config {
 
 function reloadConfig(): void {
   let opt: http.RequestOptions = {
-    protocol: 'http:',
     host: appConfig.db.host,
     port: appConfig.db.port,
     path: '/' + appConfig.db.ns,
@@ -90,7 +89,7 @@ function reloadConfig(): void {
       'Authorization': 'Bearer ' + appConfig.db.token,
       'If-None-Match': etag
     }
-  }
+  };
   let req = http.request(opt, res => {
     let data = [];
     res.on('data', d => {
