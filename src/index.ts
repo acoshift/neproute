@@ -16,11 +16,16 @@ app.use(compression({ level: 9 }));
 interface AppConfig {
   http: number;
   https: number;
-  configDir: string;
-  ssl: { // base64 + bundle ca
-    cert: string;
-    key: string;
-    ca: string;
+  ssl: {
+    cert: string; // base64
+    key: string; // base64
+    ca: string; // bundle ca, base64
+  },
+  db: {
+    host: string;
+    port: number;
+    ns: string;
+    token: string; // base64
   }
 }*/
 
@@ -31,8 +36,9 @@ function decode (base64: string): string {
 appConfig.ssl.cert = decode(appConfig.ssl.cert);
 appConfig.ssl.key = decode(appConfig.ssl.key);
 appConfig.ssl.ca = decode(appConfig.ssl.ca);
+appConfig.db.token = decode(appConfig.db.token);
 
-var configDir = path.join(__dirname, appConfig.configDir);
+// var configDir = path.join(__dirname, appConfig.configDir);
 
 interface Config {
   priority: number;
@@ -48,11 +54,11 @@ interface Config {
   }
 }
 
-var config: Config[] = [];
+var configs: Config[] = [];
+var etag = '';
 
-function load(fn: string): Config {
+function load(c: Config): Config {
   try {
-    let c: Config = JSON.parse(fs.readFileSync(fn).toString());
     if (!_.isNumber(c.priority) || !c.domain || !c.host || !c.port) return null;
     if (c.prefix && c.prefix.substr(0, 1) !== '/') c.prefix = '/' + c.prefix;
     return {
@@ -72,34 +78,58 @@ function load(fn: string): Config {
 }
 
 function reloadConfig(): void {
-  let nconfig = [];
-  fs.readdirSync(configDir).forEach(fn => {
-    let c = load(path.join(configDir, fn));
-    if (!!c) nconfig.push(c);
+  let opt: http.RequestOptions = {
+    protocol: 'http:',
+    host: appConfig.db.host,
+    port: appConfig.db.port,
+    path: '/' + appConfig.db.ns,
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/nepq',
+      'Authorization': 'Bearer ' + appConfig.db.token,
+      'If-None-Match': etag
+    }
+  }
+  let req = http.request(opt, res => {
+    let data = [];
+    res.on('data', d => {
+      data.push(d);
+    }).on('end', () => {
+      if (res.statusCode !== 200) return;
+      try {
+        let cfs: Config[] = JSON.parse(Buffer.concat(data).toString('utf8'));
+        let nconfig: Config[] = [];
+        cfs.forEach(x => {
+          let c = load(x);
+          if (!!c) nconfig.push(c);
+        });
+        configs = _.sortBy(nconfig, 'priority');
+        etag = res.headers['etag'];
+      } catch(e) {}
+    });
   });
-  config = nconfig;
+  req.on('error', () => {});
+  req.write('list configs');
+  req.end();
 }
 
-var watcher = fs.watch(configDir, (event, fn) => {
-  reloadConfig();
-});
+setInterval(reloadConfig, appConfig.interval);
 
 reloadConfig();
 
 app.use((req, res) => {
   let u = req.hostname + req.url;
   let domain;
-  let cf = _(config)
-    .filter(x => _.some(x.domain, x => {
-      let b = u.substr(0, Math.max(x.length, req.hostname.length)) === x;
-      if (b) domain = x;
-      return b;
-    }))
-    .sort((x, y) => x.priority - y.priority)
-    .first();
-  u = u.substr(domain.length);
+  let cf = _(configs).find(x => _.some(x.domain, x => {
+    let b = u.split('/').slice(0, x.split('/').length).join('/') === x;
+    if (b) domain = x;
+    return b;
+  }));
+
   if (_.isEmpty(cf)) return res.sendStatus(404);
   if (cf.ssl && cf.ssl.force && !req.secure) return res.redirect(`https://${req.hostname}${req.url}`);
+
+  u = u.substr(domain.length);
 
   let opt: http.RequestOptions = {
     protocol: 'http:',
@@ -122,10 +152,7 @@ app.use((req, res) => {
 
 var https_options: any = {
   SNICallback: (hostname, cb) => {
-    let cf = _(config)
-      .filter(x => _.some(x.domain, x => hostname === x.split('/')[0]))
-      .sort((x, y) => x.priority - y.priority)
-      .first();
+    let cf = _(configs).find(x => _.some(x.domain, x => hostname === x.split('/')[0]));
 
     if (!cf || !cf.ssl) { cb(null, null); return; }
     let r = tls.createSecureContext({
