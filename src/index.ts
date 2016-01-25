@@ -10,6 +10,7 @@ var compression = require('compression');
 import appConfig = require('./config');
 
 var app = express();
+app.disable('x-powered-by');
 app.use(compression({ level: 9 }));
 
 /*
