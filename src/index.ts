@@ -39,14 +39,13 @@ appConfig.ssl.key = decode(appConfig.ssl.key);
 appConfig.ssl.ca = decode(appConfig.ssl.ca);
 appConfig.db.token = decode(appConfig.db.token);
 
-// var configDir = path.join(__dirname, appConfig.configDir);
-
 interface Config {
   priority: number;
   domain: string[];
   host: string;
   port: number;
   prefix: string;
+  enabled: boolean;
   ssl: { // store as base64 string
     cert: string;
     key: string;
@@ -60,7 +59,7 @@ var etag = '';
 
 function load(c: Config): Config {
   try {
-    if (!_.isNumber(c.priority) || !c.domain || !c.host || !c.port) return null;
+    if (!_.isNumber(c.priority) || !c.domain || !c.host || !c.port || !c.enabled) return null;
     if (c.prefix && c.prefix.substr(0, 1) !== '/') c.prefix = '/' + c.prefix;
     return {
       priority: c.priority,
@@ -68,6 +67,7 @@ function load(c: Config): Config {
       host: c.host,
       port: c.port,
       prefix: c.prefix || '',
+      enabled: c.enabled || false,
       ssl: c.ssl ? {
         cert: decode(c.ssl.cert),
         key: decode(c.ssl.key),
@@ -102,7 +102,7 @@ function reloadConfig(): void {
         let nconfig: Config[] = [];
         cfs.forEach(x => {
           let c = load(x);
-          if (!!c) nconfig.push(c);
+          if (c) nconfig.push(c);
         });
         configs = _.sortBy(nconfig, 'priority');
         etag = res.headers['etag'];
