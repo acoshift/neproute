@@ -8,7 +8,7 @@ import appConfig from './config'
 
 const app = express()
 app.disable('x-powered-by')
-app.use(compression({ level: 9 }))
+app.use(compression(appConfig.compression))
 
 /*
 interface AppConfig {
